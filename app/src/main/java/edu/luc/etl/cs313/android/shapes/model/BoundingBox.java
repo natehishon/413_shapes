@@ -7,48 +7,67 @@ package edu.luc.etl.cs313.android.shapes.model;
  */
 public class BoundingBox implements Visitor<Location> {
 
-	// TODO entirely your job (except onCircle)
+    @Override
+    public Location onCircle(final Circle c) {
+        final int radius = c.getRadius();
+        return new Location(-radius, -radius, new Rectangle(2 * radius, 2 * radius));
+    }
 
-	@Override
-	public Location onCircle(final Circle c) {
-		final int radius = c.getRadius();
-		return new Location(-radius, -radius, new Rectangle(2 * radius, 2 * radius));
-	}
+    @Override
+    public Location onFill(final Fill f) {
+        return new Location(0, 0, f.getShape());
+    }
 
-	@Override
-	public Location onFill(final Fill f) {
-		return null;
-	}
+    @Override
+    public Location onGroup(final Group g) {
+        //TODO
+        return null;
+    }
 
-	@Override
-	public Location onGroup(final Group g) {
+    @Override
+    public Location onLocation(final Location l) {
+        return l;
+    }
 
-		return null;
-	}
+    @Override
+    public Location onRectangle(final Rectangle r) {
+        final int height = r.getHeight();
+        final int width = r.getWidth();
+        return new Location(0, 0, new Rectangle(width, height));
+    }
 
-	@Override
-	public Location onLocation(final Location l) {
+    @Override
+    public Location onStroke(final Stroke c) {
+        return new Location(0, 0, c.getShape());
+    }
 
-		return null;
-	}
+    @Override
+    public Location onOutline(final Outline o) {
+        return new Location(0, 0, o.getShape());
+    }
 
-	@Override
-	public Location onRectangle(final Rectangle r) {
-		return null;
-	}
+    @Override
+    public Location onPolygon(final Polygon s) {
+        int xMax = 0;
+        int yMax = 0;
+        int xMin = Integer.MAX_VALUE;
+        int yMin = Integer.MAX_VALUE;
+        int y = s.getPoints().get(0).getX();
+        int x = s.getPoints().get(0).getX();
 
-	@Override
-	public Location onStroke(final Stroke c) {
-		return null;
-	}
+        for (Point p : s.getPoints()) {
+            if (xMax < p.getX())
+                xMax = p.getX();
+            if (xMin > p.getX())
+                xMin = p.getX();
+            if (yMax < p.getY())
+                yMax = p.getY();
+            if (yMin > p.getY())
+                yMin = p.getY();
+        }
 
-	@Override
-	public Location onOutline(final Outline o) {
-		return null;
-	}
-
-	@Override
-	public Location onPolygon(final Polygon s) {
-		return null;
-	}
+        int width = xMax - xMin;
+        int height = yMax - yMin;
+        return new Location(y, x, new Rectangle(width, height));
+    }
 }
