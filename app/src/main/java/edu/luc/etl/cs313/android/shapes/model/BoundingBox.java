@@ -15,18 +15,34 @@ public class BoundingBox implements Visitor<Location> {
 
     @Override
     public Location onFill(final Fill f) {
-        return new Location(0, 0, f.getShape());
+        return f.getShape().accept(this);
     }
 
     @Override
     public Location onGroup(final Group g) {
-        //TODO
-        return null;
+        int xMin = Integer.MAX_VALUE;
+        int yMin = Integer.MAX_VALUE;
+        int width = 0;
+        int height = 0;
+        for (Shape s : g.getShapes()) {
+            Location l = s.accept(this);
+            Rectangle r = (Rectangle) l.getShape();
+            if (xMin > l.getX())
+                xMin = l.getX();
+            if (yMin > l.getY())
+                yMin = l.getY();
+            if (width < (r.getWidth() + l.getX()))
+                width = r.getWidth() + l.getX();
+            if (height < (r.getHeight() + l.getY()))
+                height = r.getHeight() + l.getY();
+        }
+        return new Location(xMin, yMin, new Rectangle(width - xMin, height - yMin));
     }
 
     @Override
     public Location onLocation(final Location l) {
-        return l;
+        Location temp = l.getShape().accept(this);
+        return new Location(temp.getX() + l.getX(), temp.getY() + l.getY(), temp.getShape());
     }
 
     @Override
@@ -38,12 +54,12 @@ public class BoundingBox implements Visitor<Location> {
 
     @Override
     public Location onStroke(final Stroke c) {
-        return new Location(0, 0, c.getShape());
+        return c.getShape().accept(this);
     }
 
     @Override
     public Location onOutline(final Outline o) {
-        return new Location(0, 0, o.getShape());
+        return o.getShape().accept(this);
     }
 
     @Override
@@ -52,9 +68,6 @@ public class BoundingBox implements Visitor<Location> {
         int yMax = 0;
         int xMin = Integer.MAX_VALUE;
         int yMin = Integer.MAX_VALUE;
-        int y = s.getPoints().get(0).getX();
-        int x = s.getPoints().get(0).getX();
-
         for (Point p : s.getPoints()) {
             if (xMax < p.getX())
                 xMax = p.getX();
@@ -65,9 +78,8 @@ public class BoundingBox implements Visitor<Location> {
             if (yMin > p.getY())
                 yMin = p.getY();
         }
-
         int width = xMax - xMin;
         int height = yMax - yMin;
-        return new Location(y, x, new Rectangle(width, height));
+        return new Location(xMin, yMin, new Rectangle(width, height));
     }
 }
