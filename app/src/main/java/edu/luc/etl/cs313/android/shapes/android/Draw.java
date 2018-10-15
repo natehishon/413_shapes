@@ -92,12 +92,6 @@ public class Draw implements Visitor<Void> {
         int size = s.getPoints().size();
         float[] points = new float[size * 4];
 
-        // Getting X and Y for the first point
-        float startX = s.getPoints().get(0).getX();
-        float startY = s.getPoints().get(0).getY();
-        points[0] = startX;
-        points[1] = startY;
-
         // Skipping the first point
         List<? extends Point> remainingPoints = s.getPoints().subList(1, size);
         int i = 2;
@@ -107,6 +101,12 @@ public class Draw implements Visitor<Void> {
             points[i++] = p.getX();
             points[i++] = p.getY();
         }
+
+        // Getting X and Y for the first point
+        float startX = s.getPoints().get(0).getX();
+        float startY = s.getPoints().get(0).getY();
+        points[0] = startX;
+        points[1] = startY;
 
         // Last X and Y must match first point's X and Y
         points[points.length - 2] = startX;
