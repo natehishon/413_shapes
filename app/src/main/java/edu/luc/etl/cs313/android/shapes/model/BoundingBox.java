@@ -47,9 +47,7 @@ public class BoundingBox implements Visitor<Location> {
 
     @Override
     public Location onRectangle(final Rectangle r) {
-        final int height = r.getHeight();
-        final int width = r.getWidth();
-        return new Location(0, 0, new Rectangle(width, height));
+        return new Location(0, 0, r);
     }
 
     @Override
